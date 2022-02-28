@@ -18,14 +18,13 @@ import javax.sql.DataSource;
 import java.sql.PreparedStatement;
 import java.sql.Timestamp;
 import java.sql.Types;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 @Controller
 public class ReverseController {
+    List<VerschlimmerungForm> newList = new ArrayList<>();
+
 
     @Bean
     public FlywayMigrationStrategy repairFlyway() {
@@ -36,7 +35,100 @@ public class ReverseController {
             flyway.migrate();
         };
     }
-    /*
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    @GetMapping("/")
+    public String getProblem(Model model) {
+        model.addAttribute("saveProblemForm", new ProblemForm());
+        return "problemForm";
+    }
+
+    @PostMapping("/")
+    public String saveProblem(Model model, ProblemForm problemForm) {
+
+        model.addAttribute("saveProblemForm", new ProblemForm());
+        jdbcTemplate.update("INSERT INTO PROBLEM VALUES (?,?)",problemForm.getId(), problemForm.getDescription());
+        String queryAllProblems = "SELECT * FROM PROBLEM";
+        List<ProblemForm> problemFormList = jdbcTemplate.query(queryAllProblems, new ProblemRowMapper());
+
+        return "redirect:/verschlimm";
+    }
+
+    @GetMapping("/verschlimm")
+    public String getVerschlimmerungForm(Model model, VerschlimmerungForm verschlimmerungForm, ProblemForm problemForm) {
+        model.addAttribute("saveVerschlimmerungForm", new VerschlimmerungForm());
+        return "/verschlimmerungForm";
+    }
+
+    @PostMapping("/verschlimm")
+    public String saveVerschlimmerungForm(Model model, ProblemForm problemForm, VerschlimmerungForm verschlimmerungForm) {
+        model.addAttribute("saveVerschlimmerungForm", new VerschlimmerungForm());
+        VerschlimmerungForm form = new VerschlimmerungForm();
+        form.setProblem_id(1);
+        jdbcTemplate.update("INSERT INTO WORSENING VALUES (?,?,?)", verschlimmerungForm.getId(), verschlimmerungForm.getDescription(), form.getProblem_id());
+        String queryAllVerschlimmerung = "SELECT * FROM WORSENING";
+        List<VerschlimmerungForm> verschlimmerungFormList = jdbcTemplate.query(queryAllVerschlimmerung, new VerschlimmerungRowMapper());
+
+        newList = verschlimmerungFormList;
+        System.out.println(verschlimmerungFormList);
+        return "verschlimmerungForm";
+    }
+
+
+    @GetMapping("/losung")
+    public String getLosungForm(Model model, VerschlimmerungForm verschlimmerungForm) {
+
+        model.addAttribute("saveLosungForm", new LosungForm());
+        model.addAttribute("verschlimmerungForm", verschlimmerungForm);
+        model.addAttribute("newList",newList);
+
+        //     problemFormList.get(verschlimmerungForm.getIndexOfProblem()).getVerschlimm().add(verschlimmerungForm);
+        //    verschlimmerungFormList.get(verschlimmerungFormList.getIndexOfVerschlimmerung()).getLosung().add(LosungForm)
+        return "losungForm";
+    }
+
+    @PostMapping("/losung")
+    public String getLosungForm(Model model, LosungForm losungForm) {
+        model.addAttribute("newList", newList);
+        model.addAttribute("saveLosungForm", new LosungForm());
+      /*  losungFormList.add(losungForm);
+        model.addAttribute("losungFormList", losungFormList);
+        verschlimmerungFormList.get(losungForm.getIndexOfVerschlimmerung()).getLosungen().add(losungForm);
+        // System.out.println(verschlimmerungFormList.get(losungForm.getIndexOfVerschlimmerung()));
+
+
+       */
+        return "losungForm";
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  /*
         SimpleJdbcInsert simpleJdbcInsert;
 
         @Autowired
@@ -53,25 +145,7 @@ public class ReverseController {
         }
     */
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
-
-    @GetMapping("/")
-    public String getProblem(Model model) {
-
-        model.addAttribute("saveProblemForm", new ProblemForm());
-
-        return "problemForm";
-    }
-
-    @PostMapping("/")
-    public String saveProblem(Model model, ProblemForm problemForm) {
-
-        model.addAttribute("saveProblemForm", new ProblemForm());
-        jdbcTemplate.update("INSERT INTO PROBLEM VALUES (?,?)",problemForm.getId(), problemForm.getDescription());
-        String queryAllProblems = "SELECT * FROM PROBLEM";
-        List<ProblemForm> problemFormList = jdbcTemplate.query(queryAllProblems, new ProblemRowMapper());
-
+// --------------------------------------------------------------------------------------------------------------------------------------
 
         /*
         long id = insertProblem(problemForm.getDescription());
@@ -94,56 +168,7 @@ public class ReverseController {
         //return "redirect:/verschlimm";
 */
 
-        return "redirect:/verschlimm";
-    }
-
-    @GetMapping("/verschlimm")
-    public String getVerschlimmerungForm(Model model, VerschlimmerungForm verschlimmerungForm, ProblemForm problemForm) {
-
-
-        model.addAttribute("saveVerschlimmerungForm", new VerschlimmerungForm());
-
-
-        return "/verschlimmerungForm";
-    }
-
-    @PostMapping("/verschlimm")
-    public String saveVerschlimmerungForm(Model model, ProblemForm problemForm, VerschlimmerungForm verschlimmerungForm) {
-
-
-        model.addAttribute("saveVerschlimmerungForm", new VerschlimmerungForm());
-        VerschlimmerungForm form = new VerschlimmerungForm();
-        form.setProblem_id(1);
-
-        //  int problemID = jdbcTemplate.queryForObject("SELECT* FROM PERSON WHERE ID = 1", Integer.class);
-
-        jdbcTemplate.update("INSERT INTO WORSENING VALUES (?,?,?)", verschlimmerungForm.getId(), verschlimmerungForm.getDescription(), form.getProblem_id());
-
-        return "verschlimmerungForm";
-    }
-
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+// --------------------------------------------------------------------------------------------------------------------------------------
 
 /*
 public static List<VerschlimmerungForm> verschlimmerungFormList = new ArrayList<>();
