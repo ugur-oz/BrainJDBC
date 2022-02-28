@@ -1,0 +1,9 @@
+2022-02-28 12:32:08 jdbc[4]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "CREATE TABLE PROBLEM (
+                         ID BIGSERIAL NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                         DESCRIPTION VARCHAR NOT NULL,
+)[*]"; expected "identifier"; SQL statement:
+CREATE TABLE PROBLEM (
+                         id BIGSERIAL NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                         description VARCHAR NOT NULL,
+) [42001-200]
